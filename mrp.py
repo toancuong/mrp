@@ -65,10 +65,11 @@ class mrp_workcenter(osv.osv):
         'costs_general_account_id': fields.many2one('account.account', 'General Account', domain=[('deprecated', '=', False)]),
         'resource_id': fields.many2one('resource.resource','Resource', ondelete='cascade', required=True),
         'product_id': fields.many2one('product.product','Work Center Product', help="Fill this product to easily track your production costs in the analytic accounting."),
+        'employee_ids': fields.many2many('hr.employee', 'hr_employee_workcenter_rel', 'workcenter_id', 'employee_id', 'Employees'),
+        
     }
     _defaults = {
         'capacity_per_cycle': 1.0,
-        'resource_type': 'material',
      }
 
     def on_change_product_cost(self, cr, uid, ids, product_id, context=None):
@@ -124,6 +125,7 @@ class mrp_routing_workcenter(osv.osv):
     _order = 'sequence, id'
     _columns = {
         'workcenter_id': fields.many2one('mrp.workcenter', 'Work Center', required=True),
+        'routing_line_id': fields.many2one('mrp.production.workcenter.line', 'Work Order', required=True),
         'name': fields.char('Name', required=True),
         'sequence': fields.integer('Sequence', help="Gives the sequence order when displaying a list of routing Work Centers."),
         'cycle_nbr': fields.float('Number of Cycles', required=True,
@@ -132,13 +134,13 @@ class mrp_routing_workcenter(osv.osv):
         'routing_id': fields.many2one('mrp.routing', 'Parent Routing', select=True, ondelete='cascade',
              help="Routings indicates all the Work Centers used, for how long and/or cycles." \
                 "If Routings is set then,the third tab of a production order (Work Centers) will be automatically pre-completed."),
-#------------------------------------------------------------------------------ 
-        'input_ids': fields.one2many('mrp.routing.workcenter.input', 'workcenter_operation_id', 'Work Center Property Input', copy=True),
-        'output_ids': fields.one2many('mrp.routing.workcenter.output', 'workcenter_operation_id', 'Work Center Property Output', copy=True),
-        'loss_ids': fields.one2many('mrp.routing.workcenter.loss', 'workcenter_operation_id', 'Loss Data', copy=True),
-        'assignment_ids': fields.one2many('mrp.routing.workcenter.assignment', 'workcenter_operation_id', 'Assignment', copy=True),
-#------------------------------------------------------------------------------ 
         'note': fields.text('Description'),
+        #------------------------------------------------------------------------------ 
+        'input_ids': fields.one2many('mrp.routing.workcenter.input', 'input_id', 'Work Center Property Input', copy=True),
+        'output_ids': fields.one2many('mrp.routing.workcenter.output', 'output_id', 'Work Center Property Output', copy=True),
+       #------------------------ 'loss_ids': fields.many2many('', 'Loss Data'),
+        #----------------- 'assignment_ids': fields.many2many('', 'Assignment'),
+        #------------------------------------------------------------------------------ 
         'company_id': fields.related('routing_id', 'company_id', type='many2one', relation='res.company', string='Company', store=True, readonly=True),
     }
     _defaults = {
@@ -1305,7 +1307,24 @@ class mrp_production(osv.osv):
                 workflow.trg_validate(uid, 'mrp.production', order.id, 'moves_ready', cr)
         return True
 
+class mrp_production_workcenter_input(osv.osv):
+    '''
+    Workcenter Input
+    '''
 
+    _name = 'mrp.production.workcenter.input'
+    _description = 'Workcenter Input'
+    _columns = {
+        'workorder_id': fields.many2one('mrp.production.workcenter.line', 'Work Order', required=True, ondelete='cascade', select=True),
+        'name': fields.char('Description', required=True),
+        'sequence': fields.integer('Sequence', required=True, select=True),
+        'code': fields.char('Code', size=52, required=True, help="The code that can be used in the routing rules"),
+        'amount': fields.float('Amount', help="It is used in computation. For e.g. A rule for sales having 1% commission of basic salary for per product can defined in expression like result = inputs.SALEURO.amount * contract.wage*0.01."),
+    }
+    _order = 'sequence'
+    _defaults = {
+        'sequence': 10,
+    }
 class mrp_production_workcenter_line(osv.osv):
     _name = 'mrp.production.workcenter.line'
     _description = 'Work Order'
@@ -1320,6 +1339,7 @@ class mrp_production_workcenter_line(osv.osv):
         'sequence': fields.integer('Sequence', required=True, help="Gives the sequence order when displaying a list of work orders."),
         'production_id': fields.many2one('mrp.production', 'Manufacturing Order',
             track_visibility='onchange', select=True, ondelete='cascade', required=True),
+        'input_line_ids': fields.one2many('mrp.production.workcenter.input', 'workorder_id', 'Routing Inputs', required=False, readonly=True, states={'draft': [('readonly', False)]}),
     }
     _defaults = {
         'sequence': lambda *a: 1,
