@@ -140,7 +140,7 @@ class mrp_routing_workcenter(osv.osv):
         'loss_ids': fields.one2many('mrp.routing.workcenter.loss', 'workcenter_operation_id', 'Loss Data', copy=True),
         'assignment_ids': fields.one2many('mrp.routing.workcenter.assignment', 'workcenter_operation_id', 'Assignment', copy=True),
 #------------------------------------------------------------------------------ 
-        'note': fields.text('
+        'note': fields.text('Description'),
         'company_id': fields.related('routing_id', 'company_id', type='many2one', relation='res.company', string='Company', store=True, readonly=True),
     }
     _defaults = {
