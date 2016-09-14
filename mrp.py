@@ -134,13 +134,13 @@ class mrp_routing_workcenter(osv.osv):
         'routing_id': fields.many2one('mrp.routing', 'Parent Routing', select=True, ondelete='cascade',
              help="Routings indicates all the Work Centers used, for how long and/or cycles." \
                 "If Routings is set then,the third tab of a production order (Work Centers) will be automatically pre-completed."),
-        'note': fields.text('Description'),
-        #------------------------------------------------------------------------------ 
-        'input_ids': fields.one2many('mrp.routing.workcenter.input', 'input_id', 'Work Center Property Input', copy=True),
-        'output_ids': fields.one2many('mrp.routing.workcenter.output', 'output_id', 'Work Center Property Output', copy=True),
-       #------------------------ 'loss_ids': fields.many2many('', 'Loss Data'),
-        #----------------- 'assignment_ids': fields.many2many('', 'Assignment'),
-        #------------------------------------------------------------------------------ 
+#------------------------------------------------------------------------------ 
+        'input_ids': fields.one2many('mrp.routing.workcenter.input', 'workcenter_operation_id', 'Work Center Property Input', copy=True),
+        'output_ids': fields.one2many('mrp.routing.workcenter.output', 'workcenter_operation_id', 'Work Center Property Output', copy=True),
+        'loss_ids': fields.one2many('mrp.routing.workcenter.loss', 'workcenter_operation_id', 'Loss Data', copy=True),
+        'assignment_ids': fields.one2many('mrp.routing.workcenter.assignment', 'workcenter_operation_id', 'Assignment', copy=True),
+#------------------------------------------------------------------------------ 
+        'note': fields.text('
         'company_id': fields.related('routing_id', 'company_id', type='many2one', relation='res.company', string='Company', store=True, readonly=True),
     }
     _defaults = {
