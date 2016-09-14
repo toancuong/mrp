@@ -9,3 +9,5 @@ import report
 import company
 import procurement
 import res_config
+
+from . import models

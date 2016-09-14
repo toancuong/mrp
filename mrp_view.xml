@@ -262,6 +262,44 @@
                                 <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
                             </group>
                         </group>
+                        <!-- Input, Ouput, Loss & Assignment -->
+                        <notebook>
+                            <page string="Data Input">
+                                <field name="input_ids" string="Data Input" widget="one2many_list">
+                                    <tree string="Data Input" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="code"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Data Output">
+                                <!-- <field name="description"/>
+                                <field name="code"/> -->
+                                <field name="output_ids" string="Data Output" widget="one2many_list">
+                                    <tree string="Data Output" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="code"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Loss" widget="one2many_list">
+                                <field name="loss_ids" widget="one2many_list">
+                                    <tree string="Loss" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="code"/>
+                                        <field name="rule_loss"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Assignment">
+                                <field name="assignment_ids" widget="one2many_list">
+                                    <tree string="Assignment" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="code"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                         <label for="note"/>
                         <field name="note"/>
                     </sheet>
