@@ -294,6 +294,15 @@
                                     </tree>
                                 </field>
                             </page>
+                            <page string="Bill of Loss">
+                                <field name="bol_ids" widget="one2many_list">
+                                    <tree string="Bill of Loss" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="code"/>
+                                        <field name="value"/>
+                                    </tree>
+                                </field>
+                            </page>
                             <page string="Assignment">
                                 <field name="assignment_ids" widget="one2many_list">
                                     <tree string="Assignment" editable="bottom">
@@ -302,9 +311,10 @@
                                     </tree>
                                 </field>
                             </page>
+                            <page string="Note">
+                                <field name="note"/>
+                            </page>
                         </notebook>
-                        <label for="note"/>
-                        <field name="note"/>
                     </sheet>
                 </form>
             </field>

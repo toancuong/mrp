@@ -125,7 +125,6 @@ class mrp_routing_workcenter(osv.osv):
     _order = 'sequence, id'
     _columns = {
         'workcenter_id': fields.many2one('mrp.workcenter', 'Work Center', required=True),
-        'routing_line_id': fields.many2one('mrp.production.workcenter.line', 'Work Order', required=True),
         'name': fields.char('Name', required=True),
         'sequence': fields.integer('Sequence', help="Gives the sequence order when displaying a list of routing Work Centers."),
         'cycle_nbr': fields.float('Number of Cycles', required=True,
@@ -138,6 +137,7 @@ class mrp_routing_workcenter(osv.osv):
         'input_ids': fields.one2many('mrp.routing.workcenter.input', 'workcenter_operation_id', 'Work Center Property Input', copy=True),
         'output_ids': fields.one2many('mrp.routing.workcenter.output', 'workcenter_operation_id', 'Work Center Property Output', copy=True),
         'loss_ids': fields.one2many('mrp.routing.workcenter.loss', 'workcenter_operation_id', 'Loss Data', copy=True),
+        'bol_ids': fields.one2many('mrp.routing.workcenter.bol', 'workcenter_operation_id', 'Bill of Loss', copy=True),
         'assignment_ids': fields.one2many('mrp.routing.workcenter.assignment', 'workcenter_operation_id', 'Assignment', copy=True),
 #------------------------------------------------------------------------------ 
         'note': fields.text('Description'),
