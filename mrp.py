@@ -4,6 +4,7 @@
 import time
 from collections import OrderedDict
 
+from openerp import api
 import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
@@ -142,6 +143,7 @@ class mrp_routing_workcenter(osv.osv):
 #------------------------------------------------------------------------------ 
         'note': fields.text('Description'),
         'company_id': fields.related('routing_id', 'company_id', type='many2one', relation='res.company', string='Company', store=True, readonly=True),
+        'workcenter_line_id': fields.one2many('mrp.production.workcenter.line','routing_workcenter_id','parent', required=False),
     }
     _defaults = {
         'cycle_nbr': lambda *a: 1.0,
@@ -264,6 +266,7 @@ class mrp_bom(osv.osv):
             'workcenter_id': wc.id,
             'sequence': level + (wc_use.sequence or 0),
             'cycle': cycle,
+            'routing_workcenter_id': wc_use.id,
             'hour': float(wc_use.hour_nbr * mult + ((wc.time_start or 0.0) + (wc.time_stop or 0.0) + cycle * (wc.time_cycle or 0.0)) * (wc.time_efficiency or 1.0)),
         }
 
@@ -1339,13 +1342,54 @@ class mrp_production_workcenter_line(osv.osv):
         'sequence': fields.integer('Sequence', required=True, help="Gives the sequence order when displaying a list of work orders."),
         'production_id': fields.many2one('mrp.production', 'Manufacturing Order',
             track_visibility='onchange', select=True, ondelete='cascade', required=True),
-        'input_line_ids': fields.one2many('mrp.production.workcenter.input', 'workorder_id', 'Routing Inputs', required=False, readonly=True, states={'draft': [('readonly', False)]}),
+        'input_line_ids': fields.one2many('mrp.production.workcenter.input', 'workorder_id', 'Routing Inputs', readonly=True, states={'draft': [('readonly', False)]}),
+        'routing_workcenter_id': fields.many2one('mrp.routing.workcenter', 'Routing Workcenter', required=False),
     }
+
     _defaults = {
         'sequence': lambda *a: 1,
         'hour': lambda *a: 0,
         'cycle': lambda *a: 0,
     }
+    
+    
+    def get_inputs(self, cr, uid, routing_workcenter_id, context=None):
+        res = []
+        rule_obj = self.pool.get('mrp.routing.workcenter')
+
+        for rule in rule_obj.browse(cr, uid, routing_workcenter_id.id, context=context):
+            if rule.input_ids:
+                for input in rule.input_ids:
+                    inputs = {
+                         'name': input.name,
+                         'code': input.code,
+                    }
+                    res += [inputs]
+        return res
+    
+#     def default_get(self):
+# 
+#         if not self.routing_workcenter_id:
+#                 return
+# 
+#         input_line_ids_tmp = self.get_inputs(self.routing_workcenter_id)
+#         input_lines = self.input_line_ids_tmp.browse([])
+#         for r in input_line_ids_tmp:
+#             input_lines += input_lines.new(r)
+#         return input_lines
+#     
+    def onchange_routing_workcenter_id(self, cr, uid, context=None):
+
+        if not self.routing_workcenter_id:
+                return
+
+        input_line_ids = self.get_inputs(self.routing_workcenter_id)
+        input_lines = self.input_line_ids.browse([])
+        for r in input_line_ids:
+            input_lines += input_lines.new(r)
+        self.input_line_ids = input_lines
+        return
+    
 
 class mrp_production_product_line(osv.osv):
     _name = 'mrp.production.product.line'
