@@ -240,6 +240,7 @@
             <field name="arch" type="xml">
                 <tree string="Routing Work Centers">
                     <field name="sequence" widget="handle"/>
+                    <field name="code_routing"/>
                     <field name="name"/>
                     <field name="workcenter_id"/>
                     <field name="cycle_nbr"/>
@@ -256,6 +257,7 @@
                     <sheet>
                         <group>
                             <group>
+                            	<field name="code_routing"/>
                                 <field name="name"/>
                                 <field name="workcenter_id"/>
                                 <field name="sequence" groups="base.group_no_one"/>

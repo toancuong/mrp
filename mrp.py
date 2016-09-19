@@ -122,9 +122,10 @@ class mrp_routing_workcenter(osv.osv):
     """
     _name = 'mrp.routing.workcenter'
     _description = 'Work Center Usage'
-    _order = 'sequence, id'
+    _order = 'sequence, id, code_routing'
     _columns = {
         'workcenter_id': fields.many2one('mrp.workcenter', 'Work Center', required=True),
+        'code_routing': fields.char('Code Routing', required=True),
         'name': fields.char('Name', required=True),
         'sequence': fields.integer('Sequence', help="Gives the sequence order when displaying a list of routing Work Centers."),
         'cycle_nbr': fields.float('Number of Cycles', required=True,
@@ -134,11 +135,11 @@ class mrp_routing_workcenter(osv.osv):
              help="Routings indicates all the Work Centers used, for how long and/or cycles." \
                 "If Routings is set then,the third tab of a production order (Work Centers) will be automatically pre-completed."),
 #------------------------------------------------------------------------------ 
-        'input_ids': fields.one2many('mrp.routing.workcenter.input', 'workcenter_operation_id', 'Work Center Property Input', copy=True),
-        'output_ids': fields.one2many('mrp.routing.workcenter.output', 'workcenter_operation_id', 'Work Center Property Output', copy=True),
-        'loss_ids': fields.one2many('mrp.routing.workcenter.loss', 'workcenter_operation_id', 'Loss Data', copy=True),
-        'bol_ids': fields.one2many('mrp.routing.workcenter.bol', 'workcenter_operation_id', 'Bill of Loss', copy=True),
-        'assignment_ids': fields.one2many('mrp.routing.workcenter.assignment', 'workcenter_operation_id', 'Assignment', copy=True),
+        'input_ids': fields.one2many('mrp.routing.workcenter.input', 'workcenter_operation_id', 'Work Center Property Input', ondelete='cascade', copy=True),
+        'output_ids': fields.one2many('mrp.routing.workcenter.output', 'workcenter_operation_id', 'Work Center Property Output', ondelete='cascade', copy=True),
+        'loss_ids': fields.one2many('mrp.routing.workcenter.loss', 'workcenter_operation_id', 'Loss Data', ondelete='cascade', copy=True),
+        'bol_ids': fields.one2many('mrp.routing.workcenter.bol', 'workcenter_operation_id', 'Bill of Loss', ondelete='cascade', copy=True),
+        'assignment_ids': fields.one2many('mrp.routing.workcenter.assignment', 'workcenter_operation_id', 'Assignment', ondelete='cascade', copy=True),
 #------------------------------------------------------------------------------ 
         'note': fields.text('Description'),
         'company_id': fields.related('routing_id', 'company_id', type='many2one', relation='res.company', string='Company', store=True, readonly=True),
@@ -148,6 +149,9 @@ class mrp_routing_workcenter(osv.osv):
         'hour_nbr': lambda *a: 0.0,
         'sequence': 100,
     }
+    _sql_constraints = [
+        ('code_uniqe', 'unique(code_routing)', "Tag code routing already exist !")
+    ]
 
 class mrp_bom(osv.osv):
     """
