@@ -103,8 +103,7 @@ class mrp_routing(osv.osv):
         'code': fields.char('Code', size=8),
 
         'note': fields.text('Description'),
-        'workcenter_lines': fields.one2many('mrp.routing.workcenter', 'routing_id', 'Work Centers', copy=True),
-
+        'workcenter_lines': fields.many2many('mrp.routing.workcenter', string='Work Centers', copy=True),
         'location_id': fields.many2one('stock.location', 'Production Location',
             help="Keep empty if you produce at the location where the finished products are needed." \
                 "Set a location if you produce at a fixed location. This can be a partner location " \
@@ -1354,6 +1353,7 @@ class mrp_production_workcenter_line(osv.osv):
         'sequence': lambda *a: 1,
         'hour': lambda *a: 0,
         'cycle': lambda *a: 0,
+        
     }
     
     
